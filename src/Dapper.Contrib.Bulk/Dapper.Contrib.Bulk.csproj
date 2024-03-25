@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Bulk Insert, Bulk Update, Bulk Delete with Dapper</Description>
+    <PackageProjectUrl>https://github.com/nghiand1010/Dapper.Contrib.Bulk</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nghiand1010/Dapper.Contrib.Bulk</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>AdamNguyen</Authors>
+    <Company>AdamNguyen</Company>
+    <PackageTags>dapper, bulk insert, bulk update, bulk delete</PackageTags>
+    <PackageId>Bulk.Dapper</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.28" />
+    <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+  </ItemGroup>
+
+</Project>

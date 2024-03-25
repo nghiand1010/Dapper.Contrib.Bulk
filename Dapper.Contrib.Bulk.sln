@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E830E54-4CF7-42E9-ADED-48F8A7E72749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CCF26544-54FC-4499-83AD-010DAC05587A}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.Contrib.Bulk", "src\Dapper.Contrib.Bulk\Dapper.Contrib.Bulk.csproj", "{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.Tests.Contrib.Bulk", "tests\Dapper.Contrib.Bulk.Tests\Dapper.Tests.Contrib.Bulk.csproj", "{9497FE31-DCC6-455A-B7A0-8418F13A4CB0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9497FE31-DCC6-455A-B7A0-8418F13A4CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9497FE31-DCC6-455A-B7A0-8418F13A4CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9497FE31-DCC6-455A-B7A0-8418F13A4CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9497FE31-DCC6-455A-B7A0-8418F13A4CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{35B3C9F4-055D-4D2C-B12F-A3DA53159C1E} = {2E830E54-4CF7-42E9-ADED-48F8A7E72749}
+		{9497FE31-DCC6-455A-B7A0-8418F13A4CB0} = {CCF26544-54FC-4499-83AD-010DAC05587A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98813E67-25C7-44AE-A3F9-170E7BECC173}
+	EndGlobalSection
+EndGlobal
