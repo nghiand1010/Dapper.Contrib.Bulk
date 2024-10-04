@@ -20,7 +20,7 @@ namespace Dapper.Tests.Contrib.Bulk
 
     public class SqlServerTestSuite : TestSuite
     {
-        private const string DbName = "test";
+        private const string DbName = "master";
         public static string ConnectionString =>
             GetConnectionString("SqlServerConnectionString", $"Data Source=.;Initial Catalog={DbName};User Id=sa;Password=Password.");
 

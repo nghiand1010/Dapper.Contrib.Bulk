@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using static Dapper.Contrib.Extensions.SqlMapperExtensions;
 
 namespace Dapper.Contrib.Bulk.Extensions
@@ -540,7 +541,7 @@ public partial interface ISqlBulkAdapter
 {
 
 
-    void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param,IEnumerable<T> entities=null);
+    void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param,IEnumerable<T> entities=null);
 
 
     /// <summary>
@@ -597,9 +598,9 @@ public partial class SqlServerBulkAdapter : ISqlBulkAdapter
         sb.AppendFormat("[{0}] = @{1}", columnName, columnNameParam);
     }
 
-    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
-
+      
         var tempTable = $"#tmp_{Guid.NewGuid().ToString("N")}";
         var query = $"SELECT {columnList} INTO {tempTable}  FROM {tableName} WHERE 1<>1 ;";
         connection.Execute(query);
@@ -610,7 +611,7 @@ public partial class SqlServerBulkAdapter : ISqlBulkAdapter
 
         var equalKeyvalue = new StringBuilder();
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable, equalKeyvalue);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable, equalKeyvalue);
 
         connection.Execute(updateCommand, null, transaction, commandTimeout);
     }
@@ -676,7 +677,7 @@ public partial class MySqlBulkAdapter : ISqlBulkAdapter
     }
 
 
-    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
 
         var tempTable = $"{tableName}_{Guid.NewGuid().ToString("N")}";
@@ -684,7 +685,7 @@ public partial class MySqlBulkAdapter : ISqlBulkAdapter
         var cmd = $"insert into `{tempTable}` ({columnList}) values {parameterList}";
         connection.Execute(cmd, param, transaction, commandTimeout);
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable);
 
         connection.Execute(updateCommand, null, transaction, commandTimeout);
 
@@ -771,7 +772,7 @@ public partial class PostgresBulkAdapter : ISqlBulkAdapter
     /// <param name="keys"></param>
     /// <param name="param"></param>
     /// <param name="entities"></param>
-    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
         var tempTable = $"\"{tableName}_{Guid.NewGuid().ToString("N")}\"";
         tableName = $"{tableName}";
@@ -779,7 +780,7 @@ public partial class PostgresBulkAdapter : ISqlBulkAdapter
         var cmd = $"insert into {tempTable} ({columnList}) values {parameterList}";
         connection.Execute(cmd, param, transaction, commandTimeout);
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable);
 
         connection.Execute(updateCommand, null, transaction, commandTimeout);
     }
@@ -873,10 +874,11 @@ public partial class SQLiteBulkAdapter : ISqlBulkAdapter
     /// <param name="keys"></param>
     /// <param name="param"></param>
     /// <param name="entities"></param>
-    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public void BulkUpdate<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
         connection.Update(entities);
     }
+
 }
 
 

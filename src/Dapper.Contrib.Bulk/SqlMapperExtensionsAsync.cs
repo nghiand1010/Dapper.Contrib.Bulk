@@ -60,7 +60,7 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <param name="entityToInsert"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
-        public static async Task BulkDeleteAsync<T>(this IDbConnection connection, List<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static async Task BulkDeleteAsync<T>(this IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             var (tableName, columnList, parameterList, param) = GenerateBulkDeleteParam(connection, entities);
             var query = $"Delete from {tableName} where {parameterList}";
@@ -75,7 +75,7 @@ namespace Dapper.Contrib.Bulk.Extensions
 /// </summary>
 public partial interface ISqlBulkAdapter
 {
-    Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null);
+    Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null);
 
 }
 
@@ -85,7 +85,7 @@ public partial interface ISqlBulkAdapter
 public partial class SqlServerBulkAdapter : ISqlBulkAdapter
 {
 
-    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
         var tempTable = $"#tmp_{Guid.NewGuid().ToString("N")}";
         var query = $"SELECT {columnList} INTO {tempTable}  FROM {tableName} WHERE 1<>1 ;";
@@ -97,7 +97,7 @@ public partial class SqlServerBulkAdapter : ISqlBulkAdapter
 
         var equalKeyvalue = new StringBuilder();
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable, equalKeyvalue);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable, equalKeyvalue);
 
         await connection.ExecuteAsync(updateCommand, null, transaction, commandTimeout);
     }
@@ -110,7 +110,7 @@ public partial class SqlServerBulkAdapter : ISqlBulkAdapter
 public partial class MySqlBulkAdapter : ISqlBulkAdapter
 {
 
-    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
 
         var tempTable = $"{tableName}_{Guid.NewGuid().ToString("N")}";
@@ -118,7 +118,7 @@ public partial class MySqlBulkAdapter : ISqlBulkAdapter
         var cmd = $"insert into `{tempTable}` ({columnList}) values {parameterList}";
         await connection.ExecuteAsync(cmd, param, transaction, commandTimeout);
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable);
 
         await connection.ExecuteAsync(updateCommand, null, transaction, commandTimeout);
     }
@@ -129,7 +129,7 @@ public partial class MySqlBulkAdapter : ISqlBulkAdapter
 /// </summary>
 public partial class PostgresBulkAdapter : ISqlBulkAdapter
 {
-    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
         var tempTable = $"\"{tableName}_{Guid.NewGuid().ToString("N")}\"";
         tableName = $"{tableName}";
@@ -137,7 +137,7 @@ public partial class PostgresBulkAdapter : ISqlBulkAdapter
         var cmd = $"insert into {tempTable} ({columnList}) values {parameterList}";
         await connection.ExecuteAsync(cmd, param, transaction, commandTimeout);
 
-        string updateCommand = GetUpdateCommand(tableName, updateColumns, keys, tempTable);
+        string updateCommand = GetUpdateCommand(tableName, updateColumns.ToList(), keys.ToList(), tempTable);
 
         await connection.ExecuteAsync(updateCommand, null, transaction, commandTimeout);
     }
@@ -148,7 +148,7 @@ public partial class PostgresBulkAdapter : ISqlBulkAdapter
 /// </summary>
 public partial class SQLiteBulkAdapter : ISqlBulkAdapter
 {
-    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, List<string> updateColumns, string parameterList, List<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
+    public async Task BulkUpdateAsync<T>(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, IEnumerable<string> updateColumns, string parameterList, IEnumerable<string> keys, DynamicParameters param, IEnumerable<T> entities = null)
     {
         await connection.UpdateAsync(entities);
     }
