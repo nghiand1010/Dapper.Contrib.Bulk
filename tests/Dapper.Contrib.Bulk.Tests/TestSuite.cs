@@ -167,6 +167,33 @@ namespace Dapper.Tests.Contrib.Bulk
         }
 
         [Fact]
+        public void TestInsertNormalEmpty()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                connection.Insert(users);
+                var insertedUsers = connection.GetAll<User>();
+                Assert.Equal(users.Count, insertedUsers.Count());
+            }
+        }
+
+        [Fact]
+        public void TestInsertBulkEmpty()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                connection.BulkInsert(users);
+
+                var insertedUsers = connection.GetAll<User>();
+                Assert.Equal(users.Count, insertedUsers.Count());
+            }
+        }
+
+        [Fact]
         public void TestInsertBulk()
         {
             using (var connection = GetOpenConnection())
@@ -174,6 +201,20 @@ namespace Dapper.Tests.Contrib.Bulk
                 connection.DeleteAll<User>();
                 var users = GetTempUser();
                 connection.BulkInsert(users);
+
+                var insertedUsers = connection.GetAll<User>();
+                Assert.Equal(users.Count, insertedUsers.Count());
+            }
+        }
+
+        [Fact]
+        public async Task TestInsertBulkAsyncEmpty()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                await connection.BulkInsertAsync(users);
 
                 var insertedUsers = connection.GetAll<User>();
                 Assert.Equal(users.Count, insertedUsers.Count());
@@ -264,6 +305,76 @@ namespace Dapper.Tests.Contrib.Bulk
             }
         }
 
+
+        [Fact]
+        public void TestUpdateBulkEmpty()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                connection.BulkInsert(users);
+                var insertedUsers = connection.GetAll<User>();
+                foreach (var item in insertedUsers)
+                {
+                    item.name = item.name + "_update_" + item.age;
+                }
+                connection.BulkUpdate(insertedUsers);
+                var updateUsers = connection.GetAll<User>().ToDictionary(x => x.id, x => x);
+
+                bool isTrue = true;
+                foreach (var item in insertedUsers)
+                {
+                    if (updateUsers.ContainsKey(item.id))
+                    {
+                        var user = updateUsers[item.id];
+                        isTrue = isTrue && (item.id == user.id && item.name == user.name && item.age == user.age);
+                    }
+                    else
+                    {
+                        Assert.True(false);
+                    }
+                }
+
+                Assert.True(isTrue);
+            }
+        }
+
+
+        [Fact]
+        public async Task TestUpdateBulkAsyncEmpty()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                await connection.BulkInsertAsync(users);
+                var insertedUsers = connection.GetAll<User>();
+                foreach (var item in insertedUsers)
+                {
+                    item.name = item.name + "_update_" + item.age;
+                }
+                await connection.BulkUpdateAsync(insertedUsers);
+                var updateUsers = connection.GetAll<User>().ToDictionary(x => x.id, x => x);
+
+                bool isTrue = true;
+                foreach (var item in insertedUsers)
+                {
+                    if (updateUsers.ContainsKey(item.id))
+                    {
+                        var user = updateUsers[item.id];
+                        isTrue = isTrue && (item.id == user.id && item.name == user.name && item.age == user.age);
+                    }
+                    else
+                    {
+                        Assert.True(false);
+                    }
+                }
+
+                Assert.True(isTrue);
+            }
+        }
+
         [Fact]
         public async Task TestUpdateBulkAsync()
         {
@@ -332,6 +443,38 @@ namespace Dapper.Tests.Contrib.Bulk
         }
 
         [Fact]
+        public void TestDeleteBulkEmpty()
+        {
+
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                connection.BulkInsert(users);
+                users = connection.GetAll<User>().ToList();
+                connection.BulkDelete(users);
+                var insertedUsers = connection.GetAll<User>();
+                Assert.Empty(insertedUsers);
+            }
+        }
+
+        [Fact]
+        public async Task TestDeleteBulkAsyncEmpty()
+        {
+
+            using (var connection = GetOpenConnection())
+            {
+                connection.DeleteAll<User>();
+                var users = GetEmptyUser();
+                connection.BulkInsert(users);
+                users = connection.GetAll<User>().ToList();
+                await connection.BulkDeleteAsync(users);
+                var insertedUsers = connection.GetAll<User>();
+                Assert.Empty(insertedUsers);
+            }
+        }
+
+        [Fact]
         public void TestDeleteNormal()
         {
 
@@ -364,6 +507,15 @@ namespace Dapper.Tests.Contrib.Bulk
                     new User { name = "Adama" + i, age = i % 20 });
             }
 
+            return users;
+        }
+
+        private List<User> GetEmptyUser()
+        {
+            List<User> users = new List<User>
+                {
+                    
+                };
             return users;
         }
 

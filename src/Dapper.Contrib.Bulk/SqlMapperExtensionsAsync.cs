@@ -24,6 +24,11 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <param name="commandTimeout"></param>
         public static async Task BulkInsertAsync<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+            if (!entityToInsert.Any())
+            {
+                return;
+            }
+
             var (tableName, columnList, parameterList, param) = GenerateBulkInsertParam(connection, entityToInsert);
             var cmd = $"insert into {tableName} ({columnList}) values {parameterList}";
             await connection.ExecuteAsync(cmd, param, transaction, commandTimeout);
@@ -41,6 +46,12 @@ namespace Dapper.Contrib.Bulk.Extensions
 
         public static async Task BulkUpdateAsync<T>(this IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+
+            if (!entities.Any())
+            {
+                return;
+            }
+
             if (entities is IProxy proxy && !proxy.IsDirty)
             {
                 return;
@@ -62,6 +73,12 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <param name="commandTimeout"></param>
         public static async Task BulkDeleteAsync<T>(this IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+
+            if (!entities.Any())
+            {
+                return;
+            }
+
             var (tableName, columnList, parameterList, param) = GenerateBulkDeleteParam(connection, entities);
             var query = $"Delete from {tableName} where {parameterList}";
             await connection.ExecuteAsync(query, param, transaction, commandTimeout);

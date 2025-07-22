@@ -65,6 +65,10 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <param name="commandTimeout"></param>
         public static void BulkInsert<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+            if (!entityToInsert.Any())
+            {
+                return;
+            }
             var (tableName, columnList, parameterList, param) = GenerateBulkInsertParam(connection, entityToInsert);
             var cmd = $"insert into {tableName} ({columnList}) values {parameterList}";
             connection.Execute(cmd, param, transaction, commandTimeout);
@@ -82,6 +86,12 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <exception cref="ArgumentException"></exception>
         public static void BulkUpdate<T>(this IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+
+            if (!entities.Any())
+            {
+                return;
+            }
+
             if (entities is IProxy proxy && !proxy.IsDirty)
             {
                 return;
@@ -106,6 +116,11 @@ namespace Dapper.Contrib.Bulk.Extensions
         /// <param name="commandTimeout"></param>
         public static void BulkDelete<T>(this IDbConnection connection, List<T> entities, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+            if (!entities.Any())
+            {
+                return;
+            }
+
             var (tableName, columnList, parameterList, param) = GenerateBulkDeleteParam(connection, entities);
             var query = $"Delete from {tableName} where {parameterList}";
             connection.Execute(query, param, transaction, commandTimeout);
