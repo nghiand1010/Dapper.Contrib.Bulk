@@ -1,7 +1,7 @@
 # Dapper.Contrib.Bulk
 This extension to Insert, Delete, and Update multiple entities faster, with [Dapper.Contrib](https://github.com/DapperLib/Dapper.Contrib/)
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/adamnguyen)
+
 
 ## Nuget
 ```
